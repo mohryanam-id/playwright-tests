@@ -25,3 +25,19 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+    - name: Install Vercel CLI
+      run: npm i -g vercel
+
+    # Preview deploy (every push) – gets a unique URL
+    - name: Vercel deploy (preview)
+      if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+      run: vercel deploy ./playwright-report --token ${{ secrets.VERCEL_TOKEN }} --yes
+      env:
+        VERCEL_PROJECT_NAME: playwright-report
+
+    # Production deploy (when pushing to main/master)
+    - name: Vercel deploy (production)
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+      run: vercel deploy ./playwright-report --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+      env:
+        VERCEL_PROJECT_NAME: playwright-report
